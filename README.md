@@ -7,6 +7,7 @@ The **BLDB NCBI Downloader** is a Python script designed to fetch and display FA
 - Extracts NCBI accession numbers and query parameters from BLDB HTML pages.
 - Constructs NCBI efetch URLs for retrieving FASTA sequences.
 - Fetches and displays FASTA sequences for the extracted accession numbers.
+- Optionally saves FASTA sequences to files in a specified directory.
 
 ## Installation
 
@@ -32,25 +33,32 @@ The **BLDB NCBI Downloader** is a Python script designed to fetch and display FA
 Run the script using the following command:
 
 ```bash
-python bldb_ncbi_downloader.py <BLDB_URL>
+python bldb_ncbi_downloader.py <BLDB_URL> [--output-dir <OUTPUT_DIR>]
 ```
 
-Replace `<BLDB_URL>` with the URL of the BLDB page you want to process.
+- Replace `<BLDB_URL>` with the URL of the BLDB page you want to process.
+- Optionally, use the `--output-dir` option to specify a directory where the FASTA sequences will be saved as files.
 
 ### Example
 
-```bash
-python bldb_ncbi_downloader.py "http://www.bldb.eu/BLDB.php?prot=A#AAK"
-```
+1. Display FASTA sequences in the terminal:
+   ```bash
+   python bldb_ncbi_downloader.py "http://www.bldb.eu/BLDB.php?prot=A#AAK"
+   ```
 
-The script will output the FASTA sequences for the accession numbers found on the provided BLDB page.
+2. Save FASTA sequences to a directory:
+   ```bash
+   python bldb_ncbi_downloader.py "http://www.bldb.eu/BLDB.php?prot=A#AAK" --output-dir ./fasta_sequences
+   ```
+
+The script will output the FASTA sequences for the accession numbers found on the provided BLDB page or save them to the specified directory.
 
 ## How It Works
 
 1. **Fetch HTML Content**: The script fetches the HTML content of the provided BLDB URL.
 2. **Extract Accessions**: It parses the HTML to extract NCBI accession numbers and optional query parameters (e.g., `from`, `to`, `strand`).
 3. **Build efetch URLs**: For each accession, it constructs an efetch URL to retrieve the corresponding FASTA sequence from NCBI.
-4. **Fetch FASTA Sequences**: The script fetches and displays the FASTA sequences for the extracted accession numbers.
+4. **Fetch FASTA Sequences**: The script fetches and displays the FASTA sequences for the extracted accession numbers or saves them to files if the `--output-dir` option is used.
 
 ## Example Output
 
@@ -59,6 +67,9 @@ The script will output the FASTA sequences for the accession numbers found on th
 >ABC12345.1 Example sequence
 ATGCGTACGTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGC
 ...
+
+# If using --output-dir, the output will indicate the saved file:
+FASTA for ABC12345 saved to ./fasta_sequences/ABC12345.fasta
 ```
 
 ## License
