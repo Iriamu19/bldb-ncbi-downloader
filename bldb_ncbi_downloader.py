@@ -1,6 +1,6 @@
+import os
 import re
 from dataclasses import dataclass
-import os
 from time import sleep
 from typing import List, Optional
 from urllib.parse import parse_qs
@@ -122,21 +122,22 @@ def fetch_fasta_sequence(efetch_url: str, session: requests.Session, retries: in
 
 
 @click.command()
-@click.argument("bldb_url")
 @click.option(
     "--output-dir",
     type=click.Path(file_okay=False, writable=True),
     default=None,
     help="Directory to save FASTA sequences as files.",
 )
-def main(bldb_url: str, output_dir: Optional[str]):
+def main(output_dir: Optional[str]):
     """
     Main function to fetch and display FASTA sequences from BLDB and NCBI.
 
     Args:
-        bldb_url (str): The URL of the BLDB page to fetch.
         output_dir (str, optional): Directory to save FASTA sequences as files.
     """
+
+    bldb_url = "http://www.bldb.eu/BLDB.php"
+
     if output_dir:
         os.makedirs(output_dir, exist_ok=True)
 
@@ -145,6 +146,13 @@ def main(bldb_url: str, output_dir: Optional[str]):
         accessions = extract_ncbi_accessions(html_content)
 
         for accession_obj in accessions:
+            if output_dir:
+                file_path = os.path.join(output_dir, f"{accession_obj.accession}.fasta")
+                # Skip download if the file already exists
+                if os.path.exists(file_path):
+                    print(f"FASTA for {accession_obj.accession} already exists at {file_path}. Skipping download.")
+                    continue
+
             efetch_url = build_efetch_url(
                 accession_obj.accession,
                 accession_obj.from_position,
@@ -155,7 +163,6 @@ def main(bldb_url: str, output_dir: Optional[str]):
 
             if fasta_sequence:
                 if output_dir:
-                    file_path = os.path.join(output_dir, f"{accession_obj.accession}.fasta")
                     with open(file_path, "w") as fasta_file:
                         fasta_file.write(fasta_sequence)
                     print(f"FASTA for {accession_obj.accession} saved to {file_path}")
